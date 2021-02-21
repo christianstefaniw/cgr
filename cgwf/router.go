@@ -8,10 +8,11 @@ import (
 	"unicode/utf8"
 )
 
-var AppendSlash bool
+var AppendSlash = true
 
 type Router struct {
 	routes []RouteEntry
+	warnings []string
 }
 type RouteEntry struct {
 	Path        *regexp.Regexp
@@ -39,6 +40,19 @@ func (routeEntry *RouteEntry) match(r *http.Request) map[string]string {
 		params[groupNames[i]] = group
 	}
 	return params
+}
+
+func (router *Router) check(path string) {
+	var warning string
+	if strings.Contains("(?P<", path) ||
+		strings.Index(path, "^") == 0 ||
+		strings.Index(path, "$") == utf8.RuneCountInString(path) {
+		warning =
+			"!!WARNING!!\n" +
+			 `Your url pattern ` + path +
+			` has a route that contains '(?P<', begins with a '^', or ends with a '$'.`
+	}
+	router.warnings = append(router.warnings, warning)
 }
 
 func pathToRegex(path string) *regexp.Regexp {
@@ -73,6 +87,7 @@ func pathToRegex(path string) *regexp.Regexp {
 }
 
 func (router *Router) Route(method, path string, handlerFunc http.HandlerFunc) {
+	router.check(path)
 	exactPath := pathToRegex(path)
 
 	route := RouteEntry{
