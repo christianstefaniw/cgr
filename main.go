@@ -9,9 +9,10 @@ import (
 
 func main() {
 	router := cgwf.NewRouter()
+	cgwf.AppendSlash = true
 	router.Route("GET", "/", home)
 	router.Route("GET", "/panic", error)
-	router.Route("GET", `/square/:num`, square)
+	router.Route("GET", `/square/:num/`, square)
 	cgwf.Run(router, "8000")
 }
 
