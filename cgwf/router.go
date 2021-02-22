@@ -8,23 +8,26 @@ import (
 	"unicode/utf8"
 )
 
-var AppendSlash = true
-
 type Router struct {
-	routes []RouteEntry
+	routes   []*RouteEntry
 	warnings []string
+	RouteConf
 }
 type RouteEntry struct {
 	Path        *regexp.Regexp
 	Method      string
 	HandlerFunc http.HandlerFunc
+	RouteConf
+}
+type RouteConf struct {
+	AppendSlash  bool
+	CheckPattern bool
 }
 
 func (routeEntry *RouteEntry) match(r *http.Request) map[string]string {
 	match := routeEntry.Path.FindStringSubmatch(r.URL.Path)
-
 	if match == nil {
-		if AppendSlash {
+		if routeEntry.AppendSlash && r.URL.Path[utf8.RuneCountInString(r.URL.Path)-1] != '/' {
 			match = routeEntry.Path.FindStringSubmatch(r.URL.Path + "/")
 			if match == nil {
 				return nil
@@ -49,8 +52,8 @@ func (router *Router) check(path string) {
 		strings.Index(path, "$") == utf8.RuneCountInString(path) {
 		warning =
 			"!!WARNING!!\n" +
-			 `Your url pattern ` + path +
-			` has a route that contains '(?P<', begins with a '^', or ends with a '$'.`
+				`Your url pattern ` + path +
+				` has a route that contains '(?P<', begins with a '^', or ends with a '$'.`
 	}
 	router.warnings = append(router.warnings, warning)
 }
@@ -86,17 +89,21 @@ func pathToRegex(path string) *regexp.Regexp {
 	return regexp.MustCompile("^" + newPath + "$")
 }
 
-func (router *Router) Route(method, path string, handlerFunc http.HandlerFunc) {
-	router.check(path)
+func (router *Router) Route(method, path string, handlerFunc http.HandlerFunc) *RouteEntry{
+	if router.CheckPattern{
+		router.check(path)
+	}
 	exactPath := pathToRegex(path)
 
 	route := RouteEntry{
 		Method:      method,
 		Path:        exactPath,
 		HandlerFunc: handlerFunc,
+		RouteConf:   router.RouteConf,
 	}
 
-	router.routes = append(router.routes, route)
+	router.routes = append(router.routes, &route)
+	return &route
 }
 
 func (router *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
