@@ -12,20 +12,33 @@ func main() {
 	squareConf := cgr.NewRouteConf()
 
 	// Configuration will be passed to all routes
-	router.AppendSlash(false)
+	router.SkipClean(true)
 
 	// Configuration will be passed to the route it is assigned to
 	squareConf.AppendSlash(true)
-	squareConf.SkipClean(true)
+	squareConf.SkipClean(false)
 
 
 	router.Route("/").Method("GET").Handler(home)
 	router.Route("/square/:num").SetConf(squareConf).Method("GET").Handler(square)
+	helloRoute := router.Route("/hello/:name/").Handler(hello).Method("GET")
+
+	// Configure route after declaration
+	helloRoute.AppendSlash(false)
+
 	cgr.Run("8000", router)
 }
 
 func home(w http.ResponseWriter, r *http.Request){
 	_, err := w.Write([]byte("home"))
+	if err != nil{
+		panic("error")
+	}
+}
+
+func hello(w http.ResponseWriter, r *http.Request){
+	name := cgr.GetVar(r, "name")
+	_, err := w.Write([]byte("Hello " + name))
 	if err != nil{
 		panic("error")
 	}
