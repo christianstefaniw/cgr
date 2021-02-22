@@ -25,7 +25,7 @@ func main() {
 
 
 	router.Route("/").Method("GET").Handler(home)
-	router.Route("/square/:num/:1/:2/:3/test/:4").SetConf(squareConf).Method("GET").Handler(square)
+	router.Route("/square/:num").SetConf(squareConf).Method("GET").Handler(square)
 	cgr.Run("8000", router)
 }
 
