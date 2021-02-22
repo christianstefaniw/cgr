@@ -1,6 +1,8 @@
 package cgr
 
 import (
+	"errors"
+	"net/http"
 	"strings"
 	"unicode/utf8"
 )
@@ -14,18 +16,21 @@ type router struct {
 }
 
 // Check if the route.path matches the requested URL Path (r.URL.Path)
-func (route *route) match(path string) (bool, map[string]string) {
-	match := route.path.FindStringSubmatch(path)
+func (route *route) match(r *http.Request) (bool, map[string]string, error) {
+	match := route.path.FindStringSubmatch(r.URL.Path)
 	params := make(map[string]string)
 	if match == nil {
-		if route.appendSlash && path[utf8.RuneCountInString(path)-1] != '/' {
-			match = route.path.FindStringSubmatch(path + "/")
+		if route.appendSlash && r.URL.Path[utf8.RuneCountInString(r.URL.Path)-1] != '/' {
+			match = route.path.FindStringSubmatch(r.URL.Path + "/")
 			if match == nil {
-				return false, params
+				return false, params, nil
 			}
 		} else {
-			return false, params
+			return false, params, nil
 		}
+	}
+	if r.Method != route.method{
+		return true, params, errors.New("method is not allowed")
 	}
 
 	groupNames := route.path.SubexpNames()
@@ -35,7 +40,7 @@ func (route *route) match(path string) (bool, map[string]string) {
 
 
 	// params includes the path at empty string value
-	return true, params
+	return true, params, nil
 }
 
 // Check for bad patterns

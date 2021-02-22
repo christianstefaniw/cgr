@@ -3,7 +3,6 @@ package cgr
 import (
 	"log"
 	"net/http"
-	"path"
 	"regexp"
 	"strings"
 	"unicode/utf8"
@@ -86,24 +85,6 @@ func (router *router) Route(path string) *route {
 	router.routes = append(router.routes, &r)
 	return &r
 }
-
-// Eliminates . and .. elements
-func cleanPath(p string) string {
-	if p == "" {
-		return "/"
-	}
-	if p[0] != '/' {
-		p = "/" + p
-	}
-	np := path.Clean(p)
-
-	if p[len(p)-1] == '/' && np != "/" {
-		np += "/"
-	}
-
-	return np
-}
-
 
 // Returns a pointer to a new route configuration with the default configurations
 func NewRouteConf() *routeConf {
