@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+// ServeHTTP dispatches the handler registered in the matched route.
 func (router *router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	defer internalError(&w)
 
