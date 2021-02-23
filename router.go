@@ -9,13 +9,14 @@ import (
 
 type router struct {
 
-	// TODO improve how routes are stored
-	routes   []*route
+	// Pointers to routes will be stored as values related to their first letter
+	routes   map[rune][]*route
 	warnings []string
 	routeConf
 }
 
 type params map[string]string
+
 
 // Check if the route.path matches the requested URL Path (r.URL.Path)
 func (route *route) match(r *http.Request) (bool, *params, error) {
@@ -55,6 +56,10 @@ func (router *router) check(path string) {
 				"Your url pattern " + path +
 				" has a route that contains '(?P<', begins with a '^', or ends with a '$'. \n \n"
 	}
+	if path[0] != '/'{
+		warning += "!!WARNING!! \n" +
+			"Url pattern " + path + " needs to start with a / \n \n"
+	}
 	router.warnings = append(router.warnings, warning)
 }
 
@@ -62,6 +67,7 @@ func (router *router) check(path string) {
 func NewRouter() *router {
 	r := &router{}
 	r.setDefaultRouteConf()
+	r.routes = make(map[rune][]*route)
 	return r
 }
 

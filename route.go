@@ -75,14 +75,20 @@ func (router *router) Route(path string) *route {
 
 	router.check(path)
 
-	exactPath := pathToRegex(path)
+	regexPath := pathToRegex(path)
 
 	r := route{
-		path:      exactPath,
+		path:      regexPath,
 		routeConf: router.routeConf,
 	}
 
-	router.routes = append(router.routes, &r)
+	if utf8.RuneCountInString(path) == 1{
+		router.routes['.'] = append(router.routes['.'], &r)
+	} else {
+		router.routes[rune(path[1])] = append(router.routes[rune(path[1])], &r)
+	}
+
+
 	return &r
 }
 

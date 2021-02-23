@@ -5,14 +5,25 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"unicode/utf8"
 )
 
 // ServeHTTP dispatches the handler registered in the matched route.
 func (router *router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	defer internalError(&w)
+	var letter rune
 
-	for _, r := range router.routes {
+
+
+	if utf8.RuneCountInString(req.URL.Path) == 1{
+		letter = '.'
+	} else {
+		letter = rune(req.URL.Path[1])
+	}
+
+
+	for _, r := range router.routes[letter] {
 		var p *params
 		var found bool
 		var err error

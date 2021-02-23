@@ -20,6 +20,9 @@ func main() {
 
 
 	r.Route("/").Method("GET").Handler(home)
+	r.Route("/b").Method("GET").Handler(home)
+	r.Route("/b").Method("GET").Handler(home)
+	r.Route("/c").Method("GET").Handler(home)
 	r.Route("/square/:num").SetConf(squareConf).Method("GET").Handler(square)
 	helloRoute := r.Route("/hello/:name/").Handler(hello).Method("GET")
 
