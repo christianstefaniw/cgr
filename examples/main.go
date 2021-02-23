@@ -1,4 +1,4 @@
-package cgr_test
+package main
 
 import (
 	"github.com/ChristianStefaniw/cgr"
@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func ExampleRun() {
+func main() {
 	r := cgr.NewRouter()
 	squareConf := cgr.NewRouteConf()
 
