@@ -1,15 +1,6 @@
 package cgr
 
-import (
-	"net/http"
-	"path"
-)
-
-func GetVars(r *http.Request) params {
-	ctx := r.Context()
-	p := ctx.Value("params").(map[string]string)
-	return p
-}
+import "path"
 
 // Eliminates . and .. elements
 func cleanPath(p string) string {

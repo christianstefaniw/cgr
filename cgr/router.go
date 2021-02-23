@@ -18,21 +18,21 @@ type router struct {
 type params map[string]string
 
 // Check if the route.path matches the requested URL Path (r.URL.Path)
-func (route *route) match(r *http.Request) (bool, params, error) {
+func (route *route) match(r *http.Request) (bool, *params, error) {
 	match := route.path.FindStringSubmatch(r.URL.Path)
-	p := make(map[string]string)
+	p := params{}
 	if match == nil {
 		if route.appendSlash && r.URL.Path[utf8.RuneCountInString(r.URL.Path)-1] != '/' {
 			match = route.path.FindStringSubmatch(r.URL.Path + "/")
 			if match == nil {
-				return false, p, nil
+				return false, &p, nil
 			}
 		} else {
-			return false, p, nil
+			return false, &p, nil
 		}
 	}
-	if r.Method != route.method{
-		return true, p, errors.New("method is not allowed")
+	if r.Method != route.method {
+		return true, &p, errors.New("method is not allowed")
 	}
 
 	groupNames := route.path.SubexpNames()
@@ -40,9 +40,8 @@ func (route *route) match(r *http.Request) (bool, params, error) {
 		p[groupNames[i]] = group
 	}
 
-
 	// params includes the path at empty string value
-	return true, p, nil
+	return true, &p, nil
 }
 
 // Check for bad patterns

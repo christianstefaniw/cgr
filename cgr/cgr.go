@@ -9,13 +9,14 @@ import (
 
 // ServeHTTP dispatches the handler registered in the matched route.
 func (router *router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	defer internalError(&w)
+
+	//defer internalError(&w)
 
 	for _, r := range router.routes {
-		var p map[string]string
+		var p *params
 		var found bool
 		var err error
-		if router.skipClean{
+		if router.skipClean {
 			found, p, err = r.match(req)
 		} else {
 			req.URL.Path = cleanPath(req.URL.Path)
@@ -25,11 +26,15 @@ func (router *router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			// match not found
 			continue
 		}
-		if err != nil{
+		if err != nil {
 			methodNotAllowed(&w)
 			return
 		}
-		ctx := context.WithValue(req.Context(), "params", p)
+
+		paramsAsMap := paramsToMap(p)
+
+		ctx := context.WithValue(req.Context(), "params", paramsAsMap)
+
 		r.handlerFunc.ServeHTTP(w, req.WithContext(ctx))
 		return
 	}
@@ -37,6 +42,13 @@ func (router *router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	http.NotFound(w, req)
 }
 
+func paramsToMap(p *params) map[string]string{
+	paramsAsMap := make(map[string]string)
+	for i, k := range *p {
+		paramsAsMap[i] = k
+	}
+	return paramsAsMap
+}
 
 func internalError(w *http.ResponseWriter) {
 	if r := recover(); r != nil {
@@ -44,7 +56,7 @@ func internalError(w *http.ResponseWriter) {
 	}
 }
 
-func methodNotAllowed(w *http.ResponseWriter){
+func methodNotAllowed(w *http.ResponseWriter) {
 	http.Error(*w, "405 Method Not Allowed", http.StatusMethodNotAllowed)
 }
 

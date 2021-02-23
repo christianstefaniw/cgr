@@ -116,3 +116,10 @@ Default is false
 func (conf *routeConf) SkipClean(value bool){
 	conf.skipClean = value
 }
+
+
+func GetVars(r *http.Request) map[string]string {
+	ctx := r.Context()
+	p := ctx.Value("params").(map[string]string)
+	return p
+}
