@@ -34,7 +34,7 @@ func main() {
 	cgr.Run("8000", router)
 }
 
-func home(w http.ResponseWriter, r *http.Request){
+func home(w http.ResponseWriter, _ *http.Request){
 	_, err := w.Write([]byte("home"))
 	if err != nil{
 		panic("error")
@@ -42,7 +42,7 @@ func home(w http.ResponseWriter, r *http.Request){
 }
 
 func hello(w http.ResponseWriter, r *http.Request){
-	name := cgr.GetVar(r, "name")
+	name := cgr.GetVars(r)["name"]
 	_, err := w.Write([]byte("Hello " + name))
 	if err != nil{
 		panic("error")
@@ -50,7 +50,7 @@ func hello(w http.ResponseWriter, r *http.Request){
 }
 
 func square(w http.ResponseWriter, r *http.Request){
-	num, _ := strconv.ParseFloat(cgr.GetVar(r, "num"), 32)
+	num, _ := strconv.ParseFloat(cgr.GetVars(r)["num"], 32)
 	pow := strconv.FormatFloat(math.Pow(num, 2), 'f', -1, 32)
 	_, err := w.Write([]byte(pow))
 	if err != nil{
