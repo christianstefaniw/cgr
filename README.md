@@ -6,32 +6,32 @@ Example
 package main
 
 import (
-	"./cgr"
+	"github.com/ChristianStefaniw/cgr"
 	"math"
 	"net/http"
 	"strconv"
 )
 
 func main() {
-	router := cgr.NewRouter()
+	r := cgr.NewRouter()
 	squareConf := cgr.NewRouteConf()
 
 	// Configuration will be passed to all routes
-	router.SkipClean(true)
+	r.SkipClean(true)
 
 	// Configuration will be passed to the route it is assigned to
 	squareConf.AppendSlash(true)
 	squareConf.SkipClean(false)
 
 
-	router.Route("/").Method("GET").Handler(home)
-	router.Route("/square/:num").SetConf(squareConf).Method("GET").Handler(square)
-	helloRoute := router.Route("/hello/:name/").Handler(hello).Method("GET")
+	r.Route("/").Method("GET").Handler(home)
+	r.Route("/square/:num").SetConf(squareConf).Method("GET").Handler(square)
+	helloRoute := r.Route("/hello/:name/").Handler(hello).Method("GET")
 
 	// Configure route after declaration
 	helloRoute.AppendSlash(false)
 
-	cgr.Run("8000", router)
+	cgr.Run("8000", r)
 }
 
 func home(w http.ResponseWriter, _ *http.Request){
