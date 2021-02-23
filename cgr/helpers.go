@@ -5,10 +5,10 @@ import (
 	"path"
 )
 
-func GetVar(r *http.Request, name string) string {
+func GetVars(r *http.Request) params {
 	ctx := r.Context()
-	params := ctx.Value("params").(map[string]string)
-	return params[name]
+	p := ctx.Value("params").(map[string]string)
+	return p
 }
 
 // Eliminates . and .. elements

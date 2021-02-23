@@ -15,32 +15,34 @@ type router struct {
 	routeConf
 }
 
+type params map[string]string
+
 // Check if the route.path matches the requested URL Path (r.URL.Path)
-func (route *route) match(r *http.Request) (bool, map[string]string, error) {
+func (route *route) match(r *http.Request) (bool, params, error) {
 	match := route.path.FindStringSubmatch(r.URL.Path)
-	params := make(map[string]string)
+	p := make(map[string]string)
 	if match == nil {
 		if route.appendSlash && r.URL.Path[utf8.RuneCountInString(r.URL.Path)-1] != '/' {
 			match = route.path.FindStringSubmatch(r.URL.Path + "/")
 			if match == nil {
-				return false, params, nil
+				return false, p, nil
 			}
 		} else {
-			return false, params, nil
+			return false, p, nil
 		}
 	}
 	if r.Method != route.method{
-		return true, params, errors.New("method is not allowed")
+		return true, p, errors.New("method is not allowed")
 	}
 
 	groupNames := route.path.SubexpNames()
 	for i, group := range match {
-		params[groupNames[i]] = group
+		p[groupNames[i]] = group
 	}
 
 
 	// params includes the path at empty string value
-	return true, params, nil
+	return true, p, nil
 }
 
 // Check for bad patterns

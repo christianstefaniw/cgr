@@ -12,14 +12,14 @@ func (router *router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	defer internalError(&w)
 
 	for _, r := range router.routes {
-		var params map[string]string
+		var p map[string]string
 		var found bool
 		var err error
 		if router.skipClean{
-			found, params, err = r.match(req)
+			found, p, err = r.match(req)
 		} else {
 			req.URL.Path = cleanPath(req.URL.Path)
-			found, params, err = r.match(req)
+			found, p, err = r.match(req)
 		}
 		if !found {
 			// match not found
@@ -29,7 +29,7 @@ func (router *router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			methodNotAllowed(&w)
 			return
 		}
-		ctx := context.WithValue(req.Context(), "params", params)
+		ctx := context.WithValue(req.Context(), "params", p)
 		r.handlerFunc.ServeHTTP(w, req.WithContext(ctx))
 		return
 	}
