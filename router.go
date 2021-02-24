@@ -2,7 +2,6 @@ package cgr
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 	"unicode/utf8"
@@ -19,11 +18,12 @@ type router struct {
 type params map[string]string
 
 // Check if the route.path matches the requested URL Path (r.URL.Path)
-func (route *route) match(r *http.Request) (*params, error) {
+func (route *route) params(r *http.Request) (*params, error) {
 	match := route.path.FindStringSubmatch(r.URL.Path)
+
 	p := params{}
+
 	if match == nil {
-		fmt.Println(string(r.URL.Path[utf8.RuneCountInString(r.URL.Path)-1]))
 		if route.appendSlash && r.URL.Path[utf8.RuneCountInString(r.URL.Path)-1] != pathDelimiter {
 			match = route.path.FindStringSubmatch(r.URL.Path + string(pathDelimiter))
 			if match == nil {
@@ -33,6 +33,7 @@ func (route *route) match(r *http.Request) (*params, error) {
 			return &p, nil
 		}
 	}
+
 	if r.Method != route.method {
 		return &p, errors.New("method is not allowed")
 	}
@@ -57,7 +58,7 @@ func (router *router) check(path string) {
 				"Your url pattern " + path +
 				" has a route that contains '(?P<', begins with a '^', or ends with a '$'. \n \n"
 	}
-	if path[0] != '/'{
+	if path[0] != '/' {
 		warning += "!!WARNING!! \n" +
 			"Url pattern " + path + " must to start with a / \n \n"
 	}

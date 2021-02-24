@@ -38,7 +38,7 @@ func newTree() *tree {
 func (t *tree) insert(r *route) error {
 	methodNode := t.method[r.method]
 
-	if _, ok := methodNode.children[string(r.letter)]; !ok{
+	if _, ok := methodNode.children[string(r.letter)]; !ok {
 		t.initLetterBranch(r.letter, methodNode)
 	}
 
@@ -50,7 +50,7 @@ func (t *tree) insert(r *route) error {
 	return nil
 }
 
-func routeNode(r *route) *node{
+func routeNode(r *route) *node {
 	return &node{
 		letter:   ' ',
 		route:    r,
@@ -58,10 +58,10 @@ func routeNode(r *route) *node{
 	}
 }
 
-func (t *tree) initLetterBranch(letter rune, methodNode *node){
+func (t *tree) initLetterBranch(letter rune, methodNode *node) {
 	methodNode.children[string(letter)] = &node{
 		route:    nil,
-		letter: letter,
+		letter:   letter,
 		children: make(map[string]*node),
 	}
 }
@@ -80,14 +80,15 @@ func (t *tree) search(method string, path string) (*route, error) {
 		letter = rune(path[1])
 	}
 
-
 	for _, n := range methodNode.children[string(alphabet[t.binarySearchLetterNodePos(uint8(letter))])].children {
 		match := n.route.path.FindStringSubmatch(path)
 		if match != nil {
 			return n.route, nil
 		} else {
-			if n.route.checkAppendSlash(path){
-				return n.route, nil
+			if n.route.appendSlash {
+				if n.route.checkAppendSlash(path) {
+					return n.route, nil
+				}
 			}
 		}
 	}
@@ -95,16 +96,15 @@ func (t *tree) search(method string, path string) (*route, error) {
 	return nil, errors.New("path not found")
 }
 
-func (route *route) checkAppendSlash(path string) bool{
-		if route.appendSlash && path[utf8.RuneCountInString(path)-1] != pathDelimiter {
-			match := route.path.FindStringSubmatch(path + string(pathDelimiter))
-			if match == nil {
-				return false
-			}
+func (route *route) checkAppendSlash(path string) bool {
+	if path[utf8.RuneCountInString(path)-1] != pathDelimiter {
+		match := route.path.FindStringSubmatch(path + string(pathDelimiter))
+		if match == nil {
+			return false
 		}
-		return true
+	}
+	return true
 }
-
 
 func (t *tree) binarySearchLetterNodePos(letter uint8) int {
 	start := 0
@@ -112,7 +112,7 @@ func (t *tree) binarySearchLetterNodePos(letter uint8) int {
 
 	for start <= end {
 
-		midIndex := (int(start) + int(end))/2
+		midIndex := (int(start) + int(end)) / 2
 		midLetter := alphabet[midIndex]
 
 		if midLetter == letter {

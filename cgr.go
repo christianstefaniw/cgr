@@ -27,11 +27,10 @@ func (router *router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var p *params
 
 	if router.skipClean {
-		p, err = r.match(req)
+		p, err = r.params(req)
 	} else {
 		req.URL.Path = cleanPath(req.URL.Path)
-		p, err = r.match(req)
-
+		p, err = r.params(req)
 	}
 
 	if err != nil {
