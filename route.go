@@ -1,6 +1,7 @@
 package cgr
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"regexp"
@@ -10,7 +11,9 @@ import (
 
 type route struct {
 	path        *regexp.Regexp
+	rawPath     string
 	handlerFunc http.HandlerFunc
+	letter      rune
 	err         error
 	method      string
 	routeConf
@@ -18,9 +21,8 @@ type route struct {
 
 type routeConf struct {
 	appendSlash bool
-	skipClean bool
+	skipClean   bool
 }
-
 
 func (route *route) Method(m string) *route {
 	route.method = strings.ToUpper(m)
@@ -32,16 +34,15 @@ func (route *route) Handler(handler http.HandlerFunc) *route {
 	return route
 }
 
-
 // algorithm to parse a path to a regular expression
 func pathToRegex(path string) *regexp.Regexp {
 	var newPath string
 
 	for i := 0; i < utf8.RuneCountInString(path); i++ {
-		if path[i] == ':' {
+		if path[i] == paramDelimiter {
 			var param string
-			nearestSlash := strings.IndexRune(path[i+1:], '/')
-			nearestColon := strings.IndexRune(path[i+1:], ':')
+			nearestSlash := strings.IndexRune(path[i+1:], pathDelimiter)
+			nearestParam := strings.IndexRune(path[i+1:], paramDelimiter)
 			var section string
 
 			if nearestSlash == -1 {
@@ -50,7 +51,7 @@ func pathToRegex(path string) *regexp.Regexp {
 				section = path[i+1 : nearestSlash+i+1]
 			}
 
-			if (nearestSlash > nearestColon && nearestColon != -1) || (nearestSlash == -1 && nearestColon != -1){
+			if (nearestSlash > nearestParam && nearestParam != -1) || (nearestSlash == -1 && nearestParam != -1) {
 				log.Fatal(`"/" must come before ":"`)
 			}
 
@@ -77,19 +78,26 @@ func (router *router) Route(path string) *route {
 
 	regexPath := pathToRegex(path)
 
-	r := route{
+	r := &route{
 		path:      regexPath,
+		rawPath:   path,
+		method:    "GET",
 		routeConf: router.routeConf,
 	}
 
-	if utf8.RuneCountInString(path) == 1{
-		router.routes['.'] = append(router.routes['.'], &r)
+	if utf8.RuneCountInString(path) == 1 {
+		router.routes['.'] = append(router.routes['.'], r)
+		r.letter = '.'
 	} else {
-		router.routes[rune(path[1])] = append(router.routes[rune(path[1])], &r)
+		router.routes[rune(path[1])] = append(router.routes[rune(path[1])], r)
+		r.letter = rune(path[1])
 	}
 
+	t := newTree()
+	_ = t.insert(r)
+	fmt.Println(t.search(r.method, r.rawPath))
 
-	return &r
+	return r
 }
 
 // Returns a pointer to a new route configuration with the default configurations
@@ -109,20 +117,21 @@ func (route *route) SetConf(conf *routeConf) *route {
 example.com/path is treated the same as example.com/path/
 
 Default is true
- */
-func (conf *routeConf) AppendSlash(value bool){
+*/
+func (conf *routeConf) AppendSlash(value bool) *routeConf {
 	conf.appendSlash = value
+	return conf
 }
 
 /*
 Remove . and .. from url path
 
 Default is false
- */
-func (conf *routeConf) SkipClean(value bool){
+*/
+func (conf *routeConf) SkipClean(value bool) *routeConf {
 	conf.skipClean = value
+	return conf
 }
-
 
 func GetVars(r *http.Request) map[string]string {
 	ctx := r.Context()

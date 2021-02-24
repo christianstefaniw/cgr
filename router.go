@@ -17,14 +17,13 @@ type router struct {
 
 type params map[string]string
 
-
 // Check if the route.path matches the requested URL Path (r.URL.Path)
 func (route *route) match(r *http.Request) (bool, *params, error) {
 	match := route.path.FindStringSubmatch(r.URL.Path)
 	p := params{}
 	if match == nil {
-		if route.appendSlash && r.URL.Path[utf8.RuneCountInString(r.URL.Path)-1] != '/' {
-			match = route.path.FindStringSubmatch(r.URL.Path + "/")
+		if route.appendSlash && r.URL.Path[utf8.RuneCountInString(r.URL.Path)-1] != pathDelimiter {
+			match = route.path.FindStringSubmatch(r.URL.Path + string(pathDelimiter))
 			if match == nil {
 				return false, &p, nil
 			}
@@ -58,7 +57,7 @@ func (router *router) check(path string) {
 	}
 	if path[0] != '/'{
 		warning += "!!WARNING!! \n" +
-			"Url pattern " + path + " needs to start with a / \n \n"
+			"Url pattern " + path + " must to start with a / \n \n"
 	}
 	router.warnings = append(router.warnings, warning)
 }

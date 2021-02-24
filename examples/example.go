@@ -16,18 +16,13 @@ func main() {
 
 	// Configuration will be passed to the route it is assigned to
 	squareConf.AppendSlash(true)
-	squareConf.SkipClean(false)
 
 
-	r.Route("/").Method("GET").Handler(home)
-	r.Route("/b").Method("GET").Handler(home)
-	r.Route("/b").Method("GET").Handler(home)
-	r.Route("/c").Method("GET").Handler(home)
-	r.Route("/square/:num").SetConf(squareConf).Method("GET").Handler(square)
+	r.Route("/square/:num").SetConf(squareConf).Method("GET").Handler(square).SkipClean(false)
 	helloRoute := r.Route("/hello/:name/").Handler(hello).Method("GET")
 
 	// Configure route after declaration
-	helloRoute.AppendSlash(false)
+	helloRoute.AppendSlash(true)
 
 	cgr.Run("8000", r)
 }
