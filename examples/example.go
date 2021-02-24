@@ -19,7 +19,7 @@ func main() {
 
 
 	r.Route("/").Method("GET").Handler(home)
-	r.Route("/square/:num").SetConf(squareConf).Method("GET").Handler(square).SkipClean(false)
+	r.Route("/square/:num/").SetConf(squareConf).Method("GET").Handler(square)
 	helloRoute := r.Route("/hello/:name/").Handler(hello).Method("GET")
 
 	// Configure route after declaration

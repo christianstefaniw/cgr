@@ -3,6 +3,7 @@ package cgr
 import (
 	"errors"
 	"net/http"
+	"unicode/utf8"
 )
 
 const alphabet = "abcdefghijklmnopqrstuvwxyz"
@@ -84,10 +85,24 @@ func (t *tree) search(method string, path string) (*route, error) {
 		match := n.route.path.FindStringSubmatch(path)
 		if match != nil {
 			return n.route, nil
+		} else {
+			if n.route.checkAppendSlash(path){
+				return n.route, nil
+			}
 		}
 	}
 
 	return nil, errors.New("path not found")
+}
+
+func (route *route) checkAppendSlash(path string) bool{
+		if route.appendSlash && path[utf8.RuneCountInString(path)-1] != pathDelimiter {
+			match := route.path.FindStringSubmatch(path + string(pathDelimiter))
+			if match == nil {
+				return false
+			}
+		}
+		return true
 }
 
 

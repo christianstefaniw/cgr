@@ -15,7 +15,7 @@ const (
 // ServeHTTP dispatches the handler registered in the matched route.
 func (router *router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
-	//defer internalError(&w)
+	defer internalError(&w)
 
 	r, err := router.routes.search(req.Method, req.URL.Path)
 
@@ -31,6 +31,7 @@ func (router *router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	} else {
 		req.URL.Path = cleanPath(req.URL.Path)
 		p, err = r.match(req)
+
 	}
 
 	if err != nil {

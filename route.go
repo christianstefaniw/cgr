@@ -99,7 +99,6 @@ func (router *router) Route(path string) *route {
 		}
 	}
 
-	//fmt.Println(router.routes.search(r.method, r.rawPath))
 
 	return r
 }

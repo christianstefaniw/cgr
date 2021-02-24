@@ -2,6 +2,7 @@ package cgr
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"unicode/utf8"
@@ -22,6 +23,7 @@ func (route *route) match(r *http.Request) (*params, error) {
 	match := route.path.FindStringSubmatch(r.URL.Path)
 	p := params{}
 	if match == nil {
+		fmt.Println(string(r.URL.Path[utf8.RuneCountInString(r.URL.Path)-1]))
 		if route.appendSlash && r.URL.Path[utf8.RuneCountInString(r.URL.Path)-1] != pathDelimiter {
 			match = route.path.FindStringSubmatch(r.URL.Path + string(pathDelimiter))
 			if match == nil {
