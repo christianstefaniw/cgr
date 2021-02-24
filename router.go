@@ -19,18 +19,18 @@ type params map[string]string
 
 // Check if the route.path matches the requested URL Path (r.URL.Path)
 func (route *route) params(r *http.Request) (*params, error) {
-	match := route.path.FindStringSubmatch(r.URL.Path)
 
+	match := route.path.FindStringSubmatch(r.URL.Path)
 	p := params{}
 
 	if match == nil {
 		if route.appendSlash && r.URL.Path[utf8.RuneCountInString(r.URL.Path)-1] != pathDelimiter {
 			match = route.path.FindStringSubmatch(r.URL.Path + string(pathDelimiter))
 			if match == nil {
-				return &p, nil
+				return nil, nil
 			}
 		} else {
-			return &p, nil
+			return nil, nil
 		}
 	}
 
@@ -58,7 +58,7 @@ func (router *router) check(path string) {
 				"Your url pattern " + path +
 				" has a route that contains '(?P<', begins with a '^', or ends with a '$'. \n \n"
 	}
-	if path[0] != '/' {
+	if path[0] != '/'{
 		warning += "!!WARNING!! \n" +
 			"Url pattern " + path + " must to start with a / \n \n"
 	}

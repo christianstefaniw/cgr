@@ -96,6 +96,7 @@ func (t *tree) search(method string, path string) (*route, error) {
 	return nil, errors.New("path not found")
 }
 
+
 func (route *route) checkAppendSlash(path string) bool {
 	if path[utf8.RuneCountInString(path)-1] != pathDelimiter {
 		match := route.path.FindStringSubmatch(path + string(pathDelimiter))
@@ -105,6 +106,7 @@ func (route *route) checkAppendSlash(path string) bool {
 	}
 	return true
 }
+
 
 func (t *tree) binarySearchLetterNodePos(letter uint8) int {
 	start := 0

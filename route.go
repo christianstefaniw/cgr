@@ -99,9 +99,9 @@ func (router *router) Route(path string) *route {
 		}
 	}
 
-
 	return r
 }
+
 
 // Returns a pointer to a new route configuration with the default configurations
 func NewRouteConf() *routeConf {
