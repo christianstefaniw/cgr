@@ -1,7 +1,6 @@
 package cgr
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"regexp"
@@ -86,16 +85,21 @@ func (router *router) Route(path string) *route {
 	}
 
 	if utf8.RuneCountInString(path) == 1 {
-		router.routes['.'] = append(router.routes['.'], r)
-		r.letter = '.'
+		r.letter = '/'
+		err := router.routes.insert(r)
+		if err != nil{
+			panic(err)
+		}
+
 	} else {
-		router.routes[rune(path[1])] = append(router.routes[rune(path[1])], r)
 		r.letter = rune(path[1])
+		err := router.routes.insert(r)
+		if err != nil{
+			panic(err)
+		}
 	}
 
-	t := newTree()
-	_ = t.insert(r)
-	fmt.Println(t.search(r.method, r.rawPath))
+	//fmt.Println(router.routes.search(r.method, r.rawPath))
 
 	return r
 }

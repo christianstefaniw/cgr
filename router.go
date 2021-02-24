@@ -10,7 +10,7 @@ import (
 type router struct {
 
 	// Pointers to routes will be stored as values related to their first letter
-	routes   map[rune][]*route
+	routes   *tree
 	warnings []string
 	routeConf
 }
@@ -18,21 +18,21 @@ type router struct {
 type params map[string]string
 
 // Check if the route.path matches the requested URL Path (r.URL.Path)
-func (route *route) match(r *http.Request) (bool, *params, error) {
+func (route *route) match(r *http.Request) (*params, error) {
 	match := route.path.FindStringSubmatch(r.URL.Path)
 	p := params{}
 	if match == nil {
 		if route.appendSlash && r.URL.Path[utf8.RuneCountInString(r.URL.Path)-1] != pathDelimiter {
 			match = route.path.FindStringSubmatch(r.URL.Path + string(pathDelimiter))
 			if match == nil {
-				return false, &p, nil
+				return &p, nil
 			}
 		} else {
-			return false, &p, nil
+			return &p, nil
 		}
 	}
 	if r.Method != route.method {
-		return true, &p, errors.New("method is not allowed")
+		return &p, errors.New("method is not allowed")
 	}
 
 	groupNames := route.path.SubexpNames()
@@ -41,7 +41,7 @@ func (route *route) match(r *http.Request) (bool, *params, error) {
 	}
 
 	// params includes the path at empty string value
-	return true, &p, nil
+	return &p, nil
 }
 
 // Check for bad patterns
@@ -66,7 +66,7 @@ func (router *router) check(path string) {
 func NewRouter() *router {
 	r := &router{}
 	r.setDefaultRouteConf()
-	r.routes = make(map[rune][]*route)
+	r.routes = newTree()
 	return r
 }
 

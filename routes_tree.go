@@ -3,7 +3,6 @@ package cgr
 import (
 	"errors"
 	"net/http"
-	"unicode/utf8"
 )
 
 const alphabet = "abcdefghijklmnopqrstuvwxyz"
@@ -44,13 +43,13 @@ func (t *tree) insert(r *route) error {
 
 	for _, letterNode := range methodNode.children {
 		if r.letter == letterNode.letter {
-			letterNode.children[r.rawPath] = routeNote(r)
+			letterNode.children[r.rawPath] = routeNode(r)
 		}
 	}
 	return nil
 }
 
-func routeNote(r *route) *node{
+func routeNode(r *route) *node{
 	return &node{
 		letter:   ' ',
 		route:    r,
@@ -74,15 +73,16 @@ func (t *tree) search(method string, path string) (*route, error) {
 		return nil, errors.New("there are no " + method + " routes")
 	}
 
-	if utf8.RuneCountInString(path) == 1 {
-		letter = '.'
+	if path == "/" {
+		return methodNode.children["/"].children["/"].route, nil
 	} else {
 		letter = rune(path[1])
 	}
 
 
-	for _, n := range methodNode.children[string(alphabet[t.binarySearchLetterNodePos(uint8(letter), method)])].children {
-		if n.route.rawPath == path {
+	for _, n := range methodNode.children[string(alphabet[t.binarySearchLetterNodePos(uint8(letter))])].children {
+		match := n.route.path.FindStringSubmatch(path)
+		if match != nil {
 			return n.route, nil
 		}
 	}
@@ -90,7 +90,8 @@ func (t *tree) search(method string, path string) (*route, error) {
 	return nil, errors.New("path not found")
 }
 
-func (t *tree) binarySearchLetterNodePos(letter uint8, method string) int {
+
+func (t *tree) binarySearchLetterNodePos(letter uint8) int {
 	start := 0
 	end := len(alphabet)
 

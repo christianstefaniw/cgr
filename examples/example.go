@@ -18,6 +18,7 @@ func main() {
 	squareConf.AppendSlash(true)
 
 
+	r.Route("/").Method("GET").Handler(home)
 	r.Route("/square/:num").SetConf(squareConf).Method("GET").Handler(square).SkipClean(false)
 	helloRoute := r.Route("/hello/:name/").Handler(hello).Method("GET")
 

@@ -5,60 +5,48 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"unicode/utf8"
 )
-
 
 const (
-	pathDelimiter = '/'
+	pathDelimiter  = '/'
 	paramDelimiter = ':'
 )
-
 
 // ServeHTTP dispatches the handler registered in the matched route.
 func (router *router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
-	defer internalError(&w)
-	var letter rune
+	//defer internalError(&w)
 
+	r, err := router.routes.search(req.Method, req.URL.Path)
 
-	if utf8.RuneCountInString(req.URL.Path) == 1{
-		letter = '.'
-	} else {
-		letter = rune(req.URL.Path[1])
-	}
-
-	for _, r := range router.routes[letter] {
-		var p *params
-		var found bool
-		var err error
-		if router.skipClean {
-			found, p, err = r.match(req)
-		} else {
-			req.URL.Path = cleanPath(req.URL.Path)
-			found, p, err = r.match(req)
-		}
-		if !found {
-			// match not found
-			continue
-		}
-		if err != nil {
-			methodNotAllowed(&w)
-			return
-		}
-
-		paramsAsMap := paramsToMap(p)
-
-		ctx := context.WithValue(req.Context(), "params", paramsAsMap)
-
-		r.handlerFunc.ServeHTTP(w, req.WithContext(ctx))
+	if err != nil {
+		http.NotFound(w, req)
 		return
 	}
 
-	http.NotFound(w, req)
+	var p *params
+
+	if router.skipClean {
+		p, err = r.match(req)
+	} else {
+		req.URL.Path = cleanPath(req.URL.Path)
+		p, err = r.match(req)
+	}
+
+	if err != nil {
+		methodNotAllowed(&w)
+		return
+	}
+
+	paramsAsMap := paramsToMap(p)
+
+	ctx := context.WithValue(req.Context(), "params", paramsAsMap)
+
+	r.handlerFunc.ServeHTTP(w, req.WithContext(ctx))
+
 }
 
-func paramsToMap(p *params) map[string]string{
+func paramsToMap(p *params) map[string]string {
 	paramsAsMap := make(map[string]string)
 	for i, k := range *p {
 		paramsAsMap[i] = k
