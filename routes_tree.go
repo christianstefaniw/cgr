@@ -127,3 +127,19 @@ func (t *tree) binarySearchLetterNodePos(letter uint8) int {
 	}
 	return -1
 }
+
+func (n *node) toString() string{
+	return n.route.rawPath
+}
+
+func (router *router) ViewRouteTree() []string{
+	var strTree []string
+	for k, n := range router.routes.method{
+		for p, o := range n.children{
+			for j, _ := range o.children{
+				strTree = append(strTree, k + " -> " + p + " -> " + j + "\n")
+			}
+		}
+	}
+	return strTree
+}

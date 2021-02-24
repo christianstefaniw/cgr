@@ -19,6 +19,11 @@ func main() {
 
 	r.Route("/").Method("GET").Handler(home)
 	r.Route("/square/:num/").SetConf(squareConf).Method("GET").Handler(square).AppendSlash(true)
+	r.Route("/routes").Method("GET").Handler(func(writer http.ResponseWriter, request *http.Request) {
+		for _, route := range r.ViewRouteTree(){
+			writer.Write([]byte(route))
+		}
+	})
 	helloRoute := r.Route("/hello/:name/").Handler(hello).Method("GET")
 
 	// Configure route after declaration

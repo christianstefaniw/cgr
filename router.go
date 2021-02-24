@@ -8,8 +8,6 @@ import (
 )
 
 type router struct {
-
-	// Pointers to routes will be stored as values related to their first letter
 	routes   *tree
 	warnings []string
 	routeConf
