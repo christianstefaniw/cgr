@@ -11,22 +11,26 @@ type router struct {
 	routeConf
 }
 
+type param struct {
+	key string
+	value string
+}
 
-type params map[string]string
+type params []*param
 
-func (route *route) params(path string) *params {
+func (route *route) getParams(path string) *params {
 	var match []string
+	var p params
+
 	match = route.path.FindStringSubmatch(path)
 
 	if match == nil{
 		match = route.path.FindStringSubmatch(appendSlash(path))
 	}
 
-	p := make(params)
-
 	groupNames := route.path.SubexpNames()
 	for i, group := range match {
-		p[groupNames[i]] = group
+		p = append(p, &param{key: groupNames[i], value: group})
 	}
 
 	return &p
@@ -49,6 +53,12 @@ func (router *router) check(path string) {
 	}
 	router.warnings = append(router.warnings, warning)
 }
+
+func (router *router) SkipClean(value bool) *router{
+	router.skipClean = value
+	return router
+}
+
 
 // Returns a pointer to a new router with the default route configurations
 func NewRouter() *router {

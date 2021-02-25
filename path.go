@@ -2,7 +2,11 @@ package cgr
 
 import "path"
 
-// Eliminates . and .. elements
+/*
+Clean the path
+
+Default is false
+*/
 func cleanPath(p string) string {
 	if p == "" {
 		return "/"
@@ -19,6 +23,3 @@ func cleanPath(p string) string {
 	return np
 }
 
-func appendSlash(path string) string{
-	return path + "/"
-}

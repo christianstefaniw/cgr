@@ -13,21 +13,24 @@ type route struct {
 	rawPath     string
 	handlerFunc http.HandlerFunc
 	letter      rune
-	err         error
+	params      *params
 	method      string
 	routeConf
 }
 
+// route configurations
 type routeConf struct {
 	appendSlash bool
 	skipClean   bool
 }
 
+// set an http protocol to the route
 func (route *route) Method(m string) *route {
 	route.method = strings.ToUpper(m)
 	return route
 }
 
+// attach a handler function to the route
 func (route *route) Handler(handler http.HandlerFunc) *route {
 	route.handlerFunc = handler
 	return route
@@ -39,7 +42,7 @@ func pathToRegex(path string) *regexp.Regexp {
 
 	for i := 0; i < utf8.RuneCountInString(path); i++ {
 		if path[i] == paramDelimiter {
-			var param string
+			var p string
 			nearestSlash := strings.IndexRune(path[i+1:], pathDelimiter)
 			nearestParam := strings.IndexRune(path[i+1:], paramDelimiter)
 			var section string
@@ -56,9 +59,9 @@ func pathToRegex(path string) *regexp.Regexp {
 
 			for k, paramRune := range section {
 				i++
-				param += string(paramRune)
+				p += string(paramRune)
 				if k == (utf8.RuneCountInString(section) - 1) {
-					newPath += `(?P<` + param + `>\w+)`
+					newPath += `(?P<` + p + `>\w+)`
 					break
 				}
 
@@ -75,6 +78,11 @@ func (router *router) Route(path string) *route {
 
 	router.check(path)
 
+	// TODO select cleaning for singular route
+	if !router.skipClean{
+		path = cleanPath(path)
+	}
+
 	regexPath := pathToRegex(path)
 
 	r := &route{
@@ -87,21 +95,20 @@ func (router *router) Route(path string) *route {
 	if utf8.RuneCountInString(path) == 1 {
 		r.letter = '/'
 		err := router.routes.insert(r)
-		if err != nil{
+		if err != nil {
 			panic(err)
 		}
 
 	} else {
 		r.letter = rune(path[1])
 		err := router.routes.insert(r)
-		if err != nil{
+		if err != nil {
 			panic(err)
 		}
 	}
 
 	return r
 }
-
 
 // Returns a pointer to a new route configuration with the default configurations
 func NewRouteConf() *routeConf {
@@ -123,16 +130,6 @@ Default is true
 */
 func (conf *routeConf) AppendSlash(value bool) *routeConf {
 	conf.appendSlash = value
-	return conf
-}
-
-/*
-Remove . and .. from url path
-
-Default is false
-*/
-func (conf *routeConf) SkipClean(value bool) *routeConf {
-	conf.skipClean = value
 	return conf
 }
 

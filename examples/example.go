@@ -12,22 +12,30 @@ func main() {
 	squareConf := cgr.NewRouteConf()
 
 	// Configuration will be passed to all routes
-	r.SkipClean(true)
+	r.SkipClean(false)
+	r.AppendSlash(true)
 
 	// Configuration will be passed to the route it is assigned to
 	squareConf.AppendSlash(true)
 
+
 	r.Route("/").Method("GET").Handler(home)
-	r.Route("/square/:num/").SetConf(squareConf).Method("GET").Handler(square).AppendSlash(true)
+
+	/* at path "/weirdpath" due to path cleaning */
+	r.Route("/../../weirdpath").Method("GET").Handler(showPath).AppendSlash(true)
+
+	r.Route("/square/:num/").SetConf(squareConf).Method("GET").Handler(square)
+
 	r.Route("/routes").Method("GET").Handler(func(writer http.ResponseWriter, request *http.Request) {
 		for _, route := range r.ViewRouteTree(){
 			writer.Write([]byte(route))
 		}
 	})
+
 	helloRoute := r.Route("/hello/:name/").Handler(hello).Method("GET")
 
 	// Configure route after declaration
-	helloRoute.AppendSlash(true)
+	helloRoute.AppendSlash(false)
 
 	cgr.Run("8000", r)
 }
@@ -54,4 +62,8 @@ func square(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic("error")
 	}
+}
+
+func showPath(w http.ResponseWriter, r *http.Request){
+	w.Write([]byte(r.URL.Path))
 }

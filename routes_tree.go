@@ -10,11 +10,6 @@ type tree struct {
 	method map[string]*node
 }
 
-type result struct {
-	*params
-	*route
-}
-
 type node struct {
 	route    *route
 	letter   rune
@@ -41,11 +36,13 @@ func newTree() *tree {
 func (t *tree) insert(r *route) error {
 	methodNode := t.method[r.method]
 
+	// if there is no node belonging to the path's first letter, create it
 	if _, ok := methodNode.children[string(r.letter)]; !ok {
-		t.initLetterBranch(r.letter, methodNode)
+		t.initLetterNode(r.letter, methodNode)
 	}
 
 	for _, letterNode := range methodNode.children {
+		// insert new node under the node belonging to the path's first letter
 		if r.letter == letterNode.letter {
 			letterNode.children[r.rawPath] = routeNode(r)
 		}
@@ -61,7 +58,7 @@ func routeNode(r *route) *node {
 	}
 }
 
-func (t *tree) initLetterBranch(letter rune, methodNode *node) {
+func (t *tree) initLetterNode(letter rune, methodNode *node) {
 	methodNode.children[string(letter)] = &node{
 		route:    nil,
 		letter:   letter,
@@ -69,17 +66,19 @@ func (t *tree) initLetterBranch(letter rune, methodNode *node) {
 	}
 }
 
-func (t *tree) search(method string, path string) (*result, error) {
+func (t *tree) search(method string, path string) (*route, error) {
 	methodNode := t.method[method]
 	var letter rune
+	var r *route
 
 	if len(methodNode.children) == 0 {
 		return nil, errors.New("there are no " + method + " routes")
 	}
 
 	if path == "/" {
-		r := methodNode.children["/"].children["/"].route
-		return &result{params: r.checkClean(path), route: r}, nil
+		r = methodNode.children["/"].children["/"].route
+		r.params = r.getParams(path)
+		return r, nil
 	} else {
 		letter = rune(path[1])
 	}
@@ -87,12 +86,14 @@ func (t *tree) search(method string, path string) (*result, error) {
 	for _, n := range methodNode.children[string(letter)].children {
 		match := n.route.path.FindStringSubmatch(path)
 		if match != nil {
-			return &result{params: n.route.checkClean(path), route: n.route}, nil
+			r = n.route
+			r.params = r.getParams(path)
+			return r, nil
 		} else {
-			if n.route.appendSlash {
-				if n.route.checkAppendSlash(path) {
-					return &result{params: n.route.checkClean(path), route: n.route}, nil
-				}
+			if n.route.checkAppendSlash(path) {
+				r = n.route
+				r.params = r.getParams(path)
+				return r, nil
 			}
 		}
 	}
@@ -100,32 +101,26 @@ func (t *tree) search(method string, path string) (*result, error) {
 	return nil, errors.New("path not found")
 }
 
-func (route *route) checkClean(path string) *params{
-	if route.skipClean{
-		return route.params(path)
-	} else {
-		return route.params(cleanPath(path))
-	}
-}
-
-
 func (route *route) checkAppendSlash(path string) bool {
-	if path[utf8.RuneCountInString(path)-1] != pathDelimiter {
-		match := route.path.FindStringSubmatch(path + string(pathDelimiter))
-		if match == nil {
-			return false
+	if route.appendSlash {
+		if path[utf8.RuneCountInString(path)-1] != pathDelimiter {
+			match := route.path.FindStringSubmatch(path + string(pathDelimiter))
+			if match == nil {
+				return false
+			} else {
+				return true
+			}
 		}
 	}
-	return true
+	return false
 }
 
-
-func (router *router) ViewRouteTree() []string{
+func (router *router) ViewRouteTree() []string {
 	var strTree []string
-	for k, n := range router.routes.method{
-		for p, o := range n.children{
-			for j := range o.children{
-				strTree = append(strTree, "method:" + k + " -> letter:" + p + " -> route:" + j + "\n")
+	for k, n := range router.routes.method {
+		for p, o := range n.children {
+			for j := range o.children {
+				strTree = append(strTree, "method:"+k+" -> letter:"+p+" -> route:"+j+"\n")
 			}
 		}
 	}
