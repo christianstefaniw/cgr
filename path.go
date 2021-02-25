@@ -18,3 +18,7 @@ func cleanPath(p string) string {
 
 	return np
 }
+
+func appendSlash(path string) string{
+	return path + "/"
+}

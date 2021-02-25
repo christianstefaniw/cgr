@@ -27,26 +27,21 @@ func (router *router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var p *params
 
 	if router.skipClean {
-		p, err = r.params(req)
+		p = r.params(req.URL.Path)
 	} else {
 		req.URL.Path = cleanPath(req.URL.Path)
-		p, err = r.params(req)
+		p = r.params(req.URL.Path)
 	}
 
-	if err != nil {
-		methodNotAllowed(&w)
-		return
-	}
-
-	paramsAsMap := paramsToMap(p)
+	paramsAsMap := p.paramsToMap()
 
 	ctx := context.WithValue(req.Context(), "params", paramsAsMap)
 
 	r.handlerFunc.ServeHTTP(w, req.WithContext(ctx))
-
 }
 
-func paramsToMap(p *params) map[string]string {
+
+func (p *params) paramsToMap() map[string]string {
 	paramsAsMap := make(map[string]string)
 	for i, k := range *p {
 		paramsAsMap[i] = k
