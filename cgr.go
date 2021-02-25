@@ -17,23 +17,17 @@ func (router *router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	defer internalError(&w)
 
-	r, err := router.routes.search(req.Method, req.URL.Path)
+	method := req.Method
+	path := req.URL.Path
+
+	r, err := router.routes.search(method, path)
 
 	if err != nil {
-		http.NotFound(w, req)
+		http.Error(w, fmt.Sprintf("Access %s: %s", path, err), http.StatusNotImplemented)
 		return
 	}
 
-	var p *params
-
-	if router.skipClean {
-		p = r.params(req.URL.Path)
-	} else {
-		req.URL.Path = cleanPath(req.URL.Path)
-		p = r.params(req.URL.Path)
-	}
-
-	paramsAsMap := p.paramsToMap()
+	paramsAsMap := r.params.paramsToMap()
 
 	ctx := context.WithValue(req.Context(), "params", paramsAsMap)
 

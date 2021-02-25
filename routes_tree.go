@@ -6,10 +6,13 @@ import (
 	"unicode/utf8"
 )
 
-const alphabet = "abcdefghijklmnopqrstuvwxyz"
-
 type tree struct {
 	method map[string]*node
+}
+
+type result struct {
+	*params
+	*route
 }
 
 type node struct {
@@ -66,7 +69,7 @@ func (t *tree) initLetterBranch(letter rune, methodNode *node) {
 	}
 }
 
-func (t *tree) search(method string, path string) (*route, error) {
+func (t *tree) search(method string, path string) (*result, error) {
 	methodNode := t.method[method]
 	var letter rune
 
@@ -75,25 +78,34 @@ func (t *tree) search(method string, path string) (*route, error) {
 	}
 
 	if path == "/" {
-		return methodNode.children["/"].children["/"].route, nil
+		r := methodNode.children["/"].children["/"].route
+		return &result{params: r.checkClean(path), route: r}, nil
 	} else {
 		letter = rune(path[1])
 	}
 
-	for _, n := range methodNode.children[string(alphabet[t.binarySearchLetterNodePos(uint8(letter))])].children {
+	for _, n := range methodNode.children[string(letter)].children {
 		match := n.route.path.FindStringSubmatch(path)
 		if match != nil {
-			return n.route, nil
+			return &result{params: n.route.checkClean(path), route: n.route}, nil
 		} else {
 			if n.route.appendSlash {
 				if n.route.checkAppendSlash(path) {
-					return n.route, nil
+					return &result{params: n.route.checkClean(path), route: n.route}, nil
 				}
 			}
 		}
 	}
 
 	return nil, errors.New("path not found")
+}
+
+func (route *route) checkClean(path string) *params{
+	if route.skipClean{
+		return route.params(path)
+	} else {
+		return route.params(cleanPath(path))
+	}
 }
 
 
@@ -108,36 +120,12 @@ func (route *route) checkAppendSlash(path string) bool {
 }
 
 
-func (t *tree) binarySearchLetterNodePos(letter uint8) int {
-	start := 0
-	end := len(alphabet)
-
-	for start <= end {
-
-		midIndex := (int(start) + int(end)) / 2
-		midLetter := alphabet[midIndex]
-
-		if midLetter == letter {
-			return midIndex
-		} else if midLetter < letter {
-			start = midIndex + 1
-		} else {
-			end = midIndex - 1
-		}
-	}
-	return -1
-}
-
-func (n *node) toString() string{
-	return n.route.rawPath
-}
-
 func (router *router) ViewRouteTree() []string{
 	var strTree []string
 	for k, n := range router.routes.method{
 		for p, o := range n.children{
-			for j, _ := range o.children{
-				strTree = append(strTree, k + " -> " + p + " -> " + j + "\n")
+			for j := range o.children{
+				strTree = append(strTree, "method:" + k + " -> letter:" + p + " -> route:" + j + "\n")
 			}
 		}
 	}

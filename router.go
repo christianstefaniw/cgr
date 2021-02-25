@@ -22,7 +22,7 @@ func (route *route) params(path string) *params {
 		match = route.path.FindStringSubmatch(appendSlash(path))
 	}
 
-	p := params{}
+	p := make(params)
 
 	groupNames := route.path.SubexpNames()
 	for i, group := range match {
