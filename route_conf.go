@@ -61,6 +61,7 @@ func (conf *routeConf) SkipClean(value bool) *routeConf {
 	return conf
 }
 
+
 // Set custom configurations for a route
 func (route *route) SetConf(conf *routeConf) *route {
 	route.routeConf = *conf

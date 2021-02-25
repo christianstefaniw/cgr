@@ -41,6 +41,12 @@ func (route *route) Insert(router *router) {
 			panic(err)
 		}
 
+	} else if route.rawPath[1] == ':'{
+		route.letter = rune(route.rawPath[2])
+		err := router.routes.insert(route)
+		if err != nil {
+			panic(err)
+		}
 	} else {
 		route.letter = rune(route.rawPath[1])
 		err := router.routes.insert(route)

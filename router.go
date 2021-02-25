@@ -54,8 +54,13 @@ func (router *router) check(path string) {
 	router.warnings = append(router.warnings, warning)
 }
 
+// insert route from router instance
+func (router *router) Insert(route *route){
+	route.Insert(router)
+}
 
-// Returns a pointer to a new router with the default route configurations
+
+// returns a pointer to a new router with the default route configurations
 func NewRouter() *router {
 	r := &router{}
 	r.setDefaultRouteConf()
