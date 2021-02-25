@@ -17,30 +17,31 @@ func main() {
 	squareConf := cgr.NewRouteConf()
 
 	// Configuration will be passed to all routes
-	r.SkipClean(false)
+	r.SkipClean(true)
 	r.AppendSlash(true)
 
 	// Configuration will be passed to the route it is assigned to
-	squareConf.AppendSlash(true)
+	squareConf.AppendSlash(false)
+	squareConf.SkipClean(false)
 
+	r.Route("/").Method("GET").Handler(home).Insert(r)
+	r.Route("/../../clean").Method("PUT").Handler(showPath).SkipClean(false).Insert(r)
 
-	r.Route("/").Method("GET").Handler(home)
+	r.Route("/square/:num/").SetConf(squareConf).Method("GET").Handler(square).Insert(r)
 
-	/* at path "/weirdpath" due to path cleaning */
-	r.Route("/../../weirdpath").Method("GET").Handler(showPath).AppendSlash(true)
-
-	r.Route("/square/:num/").SetConf(squareConf).Method("GET").Handler(square)
-
-	r.Route("/routes").Method("GET").Handler(func(writer http.ResponseWriter, request *http.Request) {
-		for _, route := range r.ViewRouteTree(){
-			writer.Write([]byte(route))
-		}
-	})
+	r.Route("/routes").Method("GET").Handler(
+		func(writer http.ResponseWriter, request *http.Request) {
+			for _, route := range r.ViewRouteTree() {
+				writer.Write([]byte(route))
+			}
+		},
+	).Insert(r)
 
 	helloRoute := r.Route("/hello/:name/").Handler(hello).Method("GET")
 
 	// Configure route after declaration
 	helloRoute.AppendSlash(false)
+	helloRoute.Insert(r)
 
 	cgr.Run("8000", r)
 }
@@ -69,7 +70,8 @@ func square(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func showPath(w http.ResponseWriter, r *http.Request){
+func showPath(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(r.URL.Path))
 }
+
 ```
