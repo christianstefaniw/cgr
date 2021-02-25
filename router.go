@@ -54,11 +54,6 @@ func (router *router) check(path string) {
 	router.warnings = append(router.warnings, warning)
 }
 
-func (router *router) SkipClean(value bool) *router{
-	router.skipClean = value
-	return router
-}
-
 
 // Returns a pointer to a new router with the default route configurations
 func NewRouter() *router {
@@ -66,9 +61,4 @@ func NewRouter() *router {
 	r.setDefaultRouteConf()
 	r.routes = newTree()
 	return r
-}
-
-func (conf *routeConf) setDefaultRouteConf() {
-	conf.appendSlash = true
-	conf.skipClean = false
 }

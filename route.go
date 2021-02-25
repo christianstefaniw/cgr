@@ -18,16 +18,36 @@ type route struct {
 	routeConf
 }
 
-// route configurations
-type routeConf struct {
-	appendSlash bool
-	skipClean   bool
-}
 
-// set an http protocol to the route
+// set an http protocol for the route
 func (route *route) Method(m string) *route {
 	route.method = strings.ToUpper(m)
 	return route
+}
+
+
+// insert route into tree
+func (route *route) Insert(router *router) {
+	if !route.skipClean {
+		route.rawPath = cleanPath(route.rawPath)
+	}
+
+	route.path = pathToRegex(route.rawPath)
+
+	if utf8.RuneCountInString(route.rawPath) == 1 {
+		route.letter = '/'
+		err := router.routes.insert(route)
+		if err != nil {
+			panic(err)
+		}
+
+	} else {
+		route.letter = rune(route.rawPath[1])
+		err := router.routes.insert(route)
+		if err != nil {
+			panic(err)
+		}
+	}
 }
 
 // attach a handler function to the route
@@ -78,33 +98,9 @@ func (router *router) Route(path string) *route {
 
 	router.check(path)
 
-	// TODO select cleaning for singular route
-	if !router.skipClean{
-		path = cleanPath(path)
-	}
-
-	regexPath := pathToRegex(path)
-
 	r := &route{
-		path:      regexPath,
 		rawPath:   path,
-		method:    "GET",
 		routeConf: router.routeConf,
-	}
-
-	if utf8.RuneCountInString(path) == 1 {
-		r.letter = '/'
-		err := router.routes.insert(r)
-		if err != nil {
-			panic(err)
-		}
-
-	} else {
-		r.letter = rune(path[1])
-		err := router.routes.insert(r)
-		if err != nil {
-			panic(err)
-		}
 	}
 
 	return r
@@ -117,21 +113,6 @@ func NewRouteConf() *routeConf {
 	return conf
 }
 
-// Set custom configurations for a route
-func (route *route) SetConf(conf *routeConf) *route {
-	route.routeConf = *conf
-	return route
-}
-
-/*
-example.com/path is treated the same as example.com/path/
-
-Default is true
-*/
-func (conf *routeConf) AppendSlash(value bool) *routeConf {
-	conf.appendSlash = value
-	return conf
-}
 
 func GetVars(r *http.Request) map[string]string {
 	ctx := r.Context()

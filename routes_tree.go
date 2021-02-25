@@ -29,6 +29,21 @@ func newTree() *tree {
 				route:    nil,
 				letter:   ' ',
 			},
+			http.MethodPut: {
+				children: make(map[string]*node),
+				route:    nil,
+				letter:   ' ',
+			},
+			http.MethodDelete: {
+				children: make(map[string]*node),
+				route:    nil,
+				letter:   ' ',
+			},
+			http.MethodPatch: {
+				children: make(map[string]*node),
+				route:    nil,
+				letter:   ' ',
+			},
 		},
 	}
 }
@@ -40,6 +55,7 @@ func (t *tree) insert(r *route) error {
 	if _, ok := methodNode.children[string(r.letter)]; !ok {
 		t.initLetterNode(r.letter, methodNode)
 	}
+
 
 	for _, letterNode := range methodNode.children {
 		// insert new node under the node belonging to the path's first letter
@@ -81,6 +97,10 @@ func (t *tree) search(method string, path string) (*route, error) {
 		return r, nil
 	} else {
 		letter = rune(path[1])
+	}
+
+	if _, ok := methodNode.children[string(letter)]; !ok {
+		return nil, errors.New("path not found")
 	}
 
 	for _, n := range methodNode.children[string(letter)].children {
