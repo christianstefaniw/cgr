@@ -9,9 +9,9 @@ type routeConf struct {
 
 
 /*
-example.com/path is treated the same as example.com/path/
+	example.com/path is treated the same as example.com/path/
 
-Default is true
+	Default is true
 */
 func (conf *routeConf) AppendSlash(value bool) *routeConf {
 	conf.appendSlash = value
@@ -19,9 +19,9 @@ func (conf *routeConf) AppendSlash(value bool) *routeConf {
 }
 
 /*
-example.com/path is treated the same as example.com/path/
+	example.com/path is treated the same as example.com/path/
 
-Default is true
+	Default is true
 */
 func (route *route) AppendSlash(value bool) *route {
 	route.appendSlash = value

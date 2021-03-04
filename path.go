@@ -3,9 +3,9 @@ package cgr
 import "path"
 
 /*
-Clean the path
+	Clean the path
 
-Default is false
+	Default is false
 */
 func cleanPath(p string) string {
 	if p == "" {
