@@ -20,6 +20,7 @@ func main() {
 	squareConf.SkipClean(false)
 
 	r.Route("/").Method("GET").Handler(home).Insert(r)
+	r.Route("/").Method("POST").Handler(homePost).Insert(r)
 	r.Route("/../../clean").Method("PUT").Handler(showPath).SkipClean(false).Insert(r)
 
 	r.Route("/square/:num/").SetConf(squareConf).Method("GET").Handler(square).Insert(r)
@@ -39,6 +40,10 @@ func main() {
 	helloRoute.Insert(r)
 
 	cgr.Run("8000", r)
+}
+
+func homePost(w http.ResponseWriter, _ *http.Request){
+	w.Write([]byte("post"))
 }
 
 func home(w http.ResponseWriter, _ *http.Request) {

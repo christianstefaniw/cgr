@@ -5,7 +5,7 @@ import (
 	"unicode/utf8"
 )
 
-type router struct {
+type Router struct {
 	routes   *tree
 	warnings []string
 	routeConf
@@ -37,7 +37,7 @@ func (route *route) getParams(path string) *params {
 }
 
 // Check for bad patterns
-func (router *router) check(path string) {
+func (router *Router) check(path string) {
 	var warning string
 	if strings.Contains("(?P<", path) ||
 		strings.Index(path, "^") == 0 ||
@@ -54,15 +54,15 @@ func (router *router) check(path string) {
 	router.warnings = append(router.warnings, warning)
 }
 
-// insert route from router instance
-func (router *router) Insert(route *route){
+// insert route from Router instance
+func (router *Router) Insert(route *route){
 	route.Insert(router)
 }
 
 
-// returns a pointer to a new router with the default route configurations
-func NewRouter() *router {
-	r := &router{}
+// returns a pointer to a new Router with the default route configurations
+func NewRouter() *Router {
+	r := &Router{}
 	r.setDefaultRouteConf()
 	r.routes = newTree()
 	return r

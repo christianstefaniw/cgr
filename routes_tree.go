@@ -135,7 +135,7 @@ func (route *route) checkAppendSlash(path string) bool {
 	return false
 }
 
-func (router *router) ViewRouteTree() []string {
+func (router *Router) ViewRouteTree() []string {
 	var strTree []string
 	for k, n := range router.routes.method {
 		for p, o := range n.children {

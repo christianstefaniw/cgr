@@ -10,7 +10,7 @@ import (
 
 
 // ServeHTTP dispatches the handler registered in the matched route.
-func (router *router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (router *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	defer internalError(&w)
 
@@ -39,9 +39,9 @@ func internalError(w *http.ResponseWriter) {
 	}
 }
 
-// Run attaches the router to a http.Server and starts listening and serving HTTP requests.
-// It is a shortcut for http.ListenAndServe(addr, router)
-func Run(port string, router *router) {
+// Run attaches the Router to a http.Server and starts listening and serving HTTP requests.
+// It is a shortcut for http.ListenAndServe(addr, Router)
+func Run(port string, router *Router) {
 
 	for _, warning := range router.warnings {
 		fmt.Print(warning)

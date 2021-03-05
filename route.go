@@ -27,7 +27,7 @@ func (route *route) Method(m string) *route {
 
 
 // insert route into tree
-func (route *route) Insert(router *router) {
+func (route *route) Insert(router *Router) {
 	if !route.skipClean {
 		route.rawPath = cleanPath(route.rawPath)
 	}
@@ -100,7 +100,7 @@ func pathToRegex(path string) *regexp.Regexp {
 }
 
 // Create a new route entry
-func (router *router) Route(path string) *route {
+func (router *Router) Route(path string) *route {
 
 	router.check(path)
 
