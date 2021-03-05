@@ -119,8 +119,8 @@ func NewRouteConf() *routeConf {
 	return conf
 }
 
-
-func GetVars(r *http.Request) map[string]string {
+// Get url parameters
+func GetParams(r *http.Request) map[string]string {
 	ctx := r.Context()
 	p := ctx.Value("params").(map[string]string)
 	return p

@@ -2,11 +2,9 @@ package cgr
 
 import "path"
 
-/*
-	Clean the path
-
-	Default is false
-*/
+//Clean the path
+//
+//Default is false
 func cleanPath(p string) string {
 	if p == "" {
 		return "/"
