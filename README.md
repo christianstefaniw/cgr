@@ -1,13 +1,11 @@
 # My Golang Router
 
 Instillation  
-```golang
-go get github.com/ChristianStefaniw/cgr
-```
+```go get github.com/ChristianStefaniw/cgr```
 
 Example
 
-```golang
+```
 package main
 
 import (
