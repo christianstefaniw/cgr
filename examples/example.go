@@ -18,6 +18,7 @@ func main() {
 	// Configuration will be passed to the route it is assigned to
 	squareConf.AppendSlash(false)
 	squareConf.SkipClean(false)
+	
 	r.Route("/:msg").Method("GET").Handler(echo).Insert(r)
 	r.Route("/").Method("GET").Handler(home).Insert(r)
 	r.Route("/").Method("POST").Handler(homePost).Insert(r)
