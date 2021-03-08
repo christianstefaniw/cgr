@@ -1,6 +1,6 @@
 # My Golang Router
 
-Instillation  
+Installation  
 ```go get github.com/ChristianStefaniw/cgr```
 
 Example
