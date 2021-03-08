@@ -20,6 +20,7 @@ func main() {
 	squareConf.SkipClean(false)
 	
 	r.Route("/:msg").Method("GET").Handler(echo).Insert(r)
+
 	r.Route("/").Method("GET").Handler(home).Insert(r)
 	r.Route("/").Method("POST").Handler(homePost).Insert(r)
 	r.Route("/../../clean").Method("PUT").Handler(showPath).SkipClean(false).Insert(r)
