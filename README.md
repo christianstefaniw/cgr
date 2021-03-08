@@ -5,7 +5,7 @@ Instillation
 
 Example
 
-```
+```golang
 package main
 
 import (
