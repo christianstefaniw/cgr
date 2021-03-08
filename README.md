@@ -2,7 +2,7 @@
 
 Instillation  
 ```
-go get https://github.com/ChristianStefaniw/cgr
+go get github.com/ChristianStefaniw/cgr
 ```
 
 Example
