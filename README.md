@@ -1,7 +1,7 @@
 # My Golang Router
 
 Instillation  
-```golang
+```
 go get https://github.com/ChristianStefaniw/cgr
 ```
 
