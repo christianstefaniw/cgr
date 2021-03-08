@@ -1,5 +1,10 @@
 # My Golang Router
 
+Instillation  
+```golang
+https://github.com/ChristianStefaniw/cgr
+```
+
 Example
 
 ```golang
