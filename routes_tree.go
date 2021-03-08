@@ -100,7 +100,20 @@ func (t *tree) search(method string, path string) (*route, error) {
 	}
 
 	if _, ok := methodNode.children[string(letter)]; !ok {
+
+		// check if there are routes without a letter
+		if methodNode.children[string(' ')] != nil{
+			for _, n := range methodNode.children[string(' ')].children{
+				match := n.route.path.FindStringSubmatch(path)
+				if match != nil{
+					r = n.route
+					r.params = r.getParams(path)
+					return r, nil
+				}
+			}
+		}
 		return nil, errors.New("path not found")
+
 	}
 
 	for _, n := range methodNode.children[string(letter)].children {
