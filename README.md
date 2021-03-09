@@ -1,5 +1,8 @@
 # My Golang Router
 
+Installation  
+```go get github.com/ChristianStefaniw/cgr```
+
 Example
 
 ```golang
