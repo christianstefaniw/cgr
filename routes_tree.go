@@ -11,7 +11,7 @@ type tree struct {
 }
 
 type node struct {
-	route    *route
+	route    *Route
 	letter   rune
 	children map[string]*node
 }
@@ -48,7 +48,7 @@ func newTree() *tree {
 	}
 }
 
-func (t *tree) insert(r *route) error {
+func (t *tree) insert(r *Route) error {
 	methodNode := t.method[r.method]
 
 	// if there is no node belonging to the path's first letter, create it
@@ -66,7 +66,7 @@ func (t *tree) insert(r *route) error {
 	return nil
 }
 
-func routeNode(r *route) *node {
+func routeNode(r *Route) *node {
 	return &node{
 		letter:   ' ',
 		route:    r,
@@ -82,10 +82,10 @@ func (t *tree) initLetterNode(letter rune, methodNode *node) {
 	}
 }
 
-func (t *tree) search(method string, path string) (*route, error) {
+func (t *tree) search(method string, path string) (*Route, error) {
 	methodNode := t.method[method]
 	var letter rune
-	var r *route
+	var r *Route
 
 	if len(methodNode.children) == 0 {
 		return nil, errors.New("there are no " + method + " routes")
@@ -127,7 +127,7 @@ func (t *tree) search(method string, path string) (*route, error) {
 	return nil, errors.New("path not found")
 }
 
-func (route *route) checkAppendSlash(path string) bool {
+func (route *Route) checkAppendSlash(path string) bool {
 	if route.appendSlash {
 		if path[utf8.RuneCountInString(path)-1] != pathDelimiter {
 			match := route.path.FindStringSubmatch(path + string(pathDelimiter))

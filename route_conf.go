@@ -19,7 +19,7 @@ func (conf *routeConf) AppendSlash(value bool) *routeConf {
 
 // example.com/path is treated the same as example.com/path/
 // Default is true
-func (route *route) AppendSlash(value bool) *route {
+func (route *Route) AppendSlash(value bool) *Route {
 	route.appendSlash = value
 	return route
 }
@@ -35,7 +35,7 @@ func (route *route) AppendSlash(value bool) *route {
 //    that is, replace "/.." by "/" at the beginning of a path
 //
 //Default value is false
-func (route *route) SkipClean(value bool) *route {
+func (route *Route) SkipClean(value bool) *Route {
 	route.skipClean = value
 	return route
 }
@@ -57,7 +57,7 @@ func (conf *routeConf) SkipClean(value bool) *routeConf {
 
 
 // Set custom configurations for a route
-func (route *route) SetConf(conf *routeConf) *route {
+func (route *Route) SetConf(conf *routeConf) *Route {
 	route.routeConf = *conf
 	return route
 }

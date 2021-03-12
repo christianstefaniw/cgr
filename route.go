@@ -8,26 +8,25 @@ import (
 	"unicode/utf8"
 )
 
-type route struct {
+type Route struct {
 	path        *regexp.Regexp
 	rawPath     string
 	handlerFunc http.HandlerFunc
 	letter      rune
 	params      *params
 	method      string
+	router      *Router
 	routeConf
 }
 
-
-// set an http protocol for the route
-func (route *route) Method(m string) *route {
+// set an http protocol for the Route
+func (route *Route) Method(m string) *Route {
 	route.method = strings.ToUpper(m)
 	return route
 }
 
-
-// insert route into tree
-func (route *route) Insert(router *Router) {
+// insert Route into tree
+func (route *Route) Insert() {
 	if !route.skipClean {
 		route.rawPath = cleanPath(route.rawPath)
 	}
@@ -36,28 +35,28 @@ func (route *route) Insert(router *Router) {
 
 	if utf8.RuneCountInString(route.rawPath) == 1 {
 		route.letter = '/'
-		err := router.routes.insert(route)
+		err := route.router.routes.insert(route)
 		if err != nil {
 			panic(err)
 		}
 
-	} else if route.rawPath[1] == ':'{
+	} else if route.rawPath[1] == ':' {
 		route.letter = ' '
-		err := router.routes.insert(route)
+		err := route.router.routes.insert(route)
 		if err != nil {
 			panic(err)
 		}
 	} else {
 		route.letter = rune(route.rawPath[1])
-		err := router.routes.insert(route)
+		err := route.router.routes.insert(route)
 		if err != nil {
 			panic(err)
 		}
 	}
 }
 
-// attach a handler function to the route
-func (route *route) Handler(handler http.HandlerFunc) *route {
+// attach a handler function to the Route
+func (route *Route) Handler(handler http.HandlerFunc) *Route {
 	route.handlerFunc = handler
 	return route
 }
@@ -99,20 +98,21 @@ func pathToRegex(path string) *regexp.Regexp {
 	return regexp.MustCompile("^" + newPath + "$")
 }
 
-// Create a new route entry
-func (router *Router) Route(path string) *route {
+// Create a new Route entry
+func (router *Router) Route(path string) *Route {
 
 	router.check(path)
 
-	r := &route{
+	r := &Route{
 		rawPath:   path,
 		routeConf: router.routeConf,
+		router: router,
 	}
 
 	return r
 }
 
-// Returns a pointer to a new route configuration with the default configurations
+// Returns a pointer to a new Route configuration with the default configurations
 func NewRouteConf() *routeConf {
 	conf := &routeConf{}
 	conf.setDefaultRouteConf()

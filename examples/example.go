@@ -19,12 +19,12 @@ func main() {
 	squareConf.AppendSlash(false)
 	squareConf.SkipClean(false)
 
-	r.Route("/:msg").Method("GET").Handler(echo).Insert(r)
-	r.Route("/").Method("GET").Handler(home).Insert(r)
-	r.Route("/").Method("POST").Handler(homePost).Insert(r)
-	r.Route("/../../clean").Method("PUT").Handler(showPath).SkipClean(false).Insert(r)
+	r.Route("/:msg").Method("GET").Handler(echo).Insert()
+	r.Route("/").Method("GET").Handler(home).Insert()
+	r.Route("/").Method("POST").Handler(homePost).Insert()
+	r.Route("/../../clean").Method("PUT").Handler(showPath).SkipClean(false).Insert()
 
-	r.Route("/square/:num/").SetConf(squareConf).Method("GET").Handler(square).Insert(r)
+	r.Route("/square/:num/").SetConf(squareConf).Method("GET").Handler(square).Insert()
 
 	r.Route("/routes").Method("GET").Handler(
 		func(writer http.ResponseWriter, request *http.Request) {
@@ -32,13 +32,13 @@ func main() {
 				writer.Write([]byte(route))
 			}
 		},
-	).Insert(r)
+	).Insert()
 
 	helloRoute := r.Route("/hello/:name/").Handler(hello).Method("GET")
 
 	// Configure route after declaration
 	helloRoute.AppendSlash(false)
-	helloRoute.Insert(r)
+	helloRoute.Insert()
 
 	cgr.Run("8000", r)
 }

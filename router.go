@@ -18,7 +18,7 @@ type param struct {
 
 type params []*param
 
-func (route *route) getParams(path string) *params {
+func (route *Route) getParams(path string) *params {
 	var match []string
 	var p params
 
@@ -55,8 +55,8 @@ func (router *Router) check(path string) {
 }
 
 // insert route from Router instance
-func (router *Router) Insert(route *route){
-	route.Insert(router)
+func (router *Router) Insert(route *Route){
+	route.Insert()
 }
 
 
