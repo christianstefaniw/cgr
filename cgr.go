@@ -20,7 +20,7 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	r, err := router.routes.search(method, path)
 
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Access %s: %s", path, err), http.StatusNotImplemented)
+		http.Error(w, fmt.Sprintf("Error: %s", err), http.StatusNotImplemented)
 		return
 	}
 	paramsAsMap := r.params.paramsToMap()

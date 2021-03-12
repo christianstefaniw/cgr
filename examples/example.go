@@ -23,7 +23,6 @@ func main() {
 
 	r.Route("/").Method("GET").Handler(home).Insert(r)
 	r.Route("/").Method("POST").Handler(homePost).Insert(r)
-	r.Route("/../../clean").Method("PUT").Handler(showPath).SkipClean(false).Insert(r)
 
 	r.Route("/square/:num/").SetConf(squareConf).Method("GET").Handler(square).Insert(r)
 
@@ -70,10 +69,6 @@ func square(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic("error")
 	}
-}
-
-func showPath(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(r.URL.Path))
 }
 
 func echo(w http.ResponseWriter, r *http.Request){
