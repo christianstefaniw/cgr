@@ -1,11 +1,24 @@
 package main
 
 import (
-	"github.com/ChristianStefaniw/cgr"
+	"fmt"
 	"math"
 	"net/http"
 	"strconv"
+	"time"
+
+	"github.com/ChristianStefaniw/cgr"
 )
+
+func loggerMiddleware() {
+	fmt.Println("Logger middleware executing...")
+	t := time.Now()
+	fmt.Println(t)
+}
+
+func testMiddleware() {
+	fmt.Println("test middleware executing...")
+}
 
 func main() {
 	r := cgr.NewRouter()
@@ -19,7 +32,10 @@ func main() {
 	squareConf.AppendSlash(false)
 	squareConf.SkipClean(false)
 
-	r.Route("/:msg").Method("GET").Handler(echo).Insert()
+	logger := cgr.NewMiddleware(loggerMiddleware)
+	test := cgr.NewMiddleware(testMiddleware)
+
+	r.Route("/:msg").Method("GET").Handler(echo).Assign(logger).Assign(test).Insert()
 	r.Route("/").Method("GET").Handler(home).Insert()
 	r.Route("/").Method("POST").Handler(homePost).Insert()
 	r.Route("/../../clean").Method("PUT").Handler(showPath).SkipClean(false).Insert()
@@ -43,7 +59,7 @@ func main() {
 	r.Run("8000")
 }
 
-func homePost(w http.ResponseWriter, _ *http.Request){
+func homePost(w http.ResponseWriter, _ *http.Request) {
 	w.Write([]byte("post"))
 }
 
@@ -75,6 +91,6 @@ func showPath(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(r.URL.Path))
 }
 
-func echo(w http.ResponseWriter, r *http.Request){
+func echo(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(cgr.GetParams(r)["msg"]))
 }

@@ -16,7 +16,14 @@ type Route struct {
 	params      *params
 	method      string
 	router      *Router
+	middleware  *middlewareLinkedList
 	routeConf
+}
+
+// assign middleware to the route
+func (route *Route) Assign(middleware *middleware) *Route {
+	route.middleware.insert(middleware)
+	return route
 }
 
 // set an http protocol for the Route
@@ -104,9 +111,10 @@ func (router *Router) Route(path string) *Route {
 	router.check(path)
 
 	r := &Route{
-		rawPath:   path,
-		routeConf: router.routeConf,
-		router: router,
+		rawPath:    path,
+		routeConf:  router.routeConf,
+		router:     router,
+		middleware: new(middlewareLinkedList),
 	}
 
 	return r
@@ -124,4 +132,13 @@ func GetParams(r *http.Request) map[string]string {
 	ctx := r.Context()
 	p := ctx.Value("params").(map[string]string)
 	return p
+}
+
+func (route *Route) executeMiddleware(w http.ResponseWriter, r *http.Request) {
+	currNode := route.middleware.head
+	for currNode != nil {
+		currNode.mware.run()
+		currNode = currNode.next
+	}
+	route.handlerFunc.ServeHTTP(w, r)
 }

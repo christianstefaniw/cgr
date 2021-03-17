@@ -6,8 +6,6 @@ import (
 	"net/http"
 )
 
-
-
 // ServeHTTP dispatches the handler registered in the matched route.
 func (router *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
@@ -22,12 +20,17 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, fmt.Sprintf("Access %s: %s", path, err), http.StatusNotImplemented)
 		return
 	}
+
 	paramsAsMap := r.params.paramsToMap()
 
 	ctx := context.WithValue(req.Context(), "params", paramsAsMap)
-	r.handlerFunc.ServeHTTP(w, req.WithContext(ctx))
-}
 
+	if r.middleware.len() == 0 {
+		r.handlerFunc.ServeHTTP(w, req.WithContext(ctx))
+	} else {
+		r.executeMiddleware(w, req.WithContext(ctx))
+	}
+}
 
 func internalError(w *http.ResponseWriter) {
 	if r := recover(); r != nil {
