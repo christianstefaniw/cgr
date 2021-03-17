@@ -3,7 +3,6 @@ package cgr
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 )
 
@@ -34,16 +33,4 @@ func internalError(w *http.ResponseWriter) {
 	if r := recover(); r != nil {
 		http.Error(*w, "500 Internal Server Error", http.StatusInternalServerError)
 	}
-}
-
-// Run attaches the Router to a http.Server and starts listening and serving HTTP requests.
-// It is a shortcut for http.ListenAndServe(addr, Router)
-func Run(port string, router *Router) {
-
-	for _, warning := range router.warnings {
-		fmt.Print(warning)
-	}
-
-	fmt.Println("Listing on port:", port)
-	log.Fatal(http.ListenAndServe(":"+port, router))
 }
