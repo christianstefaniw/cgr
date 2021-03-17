@@ -40,7 +40,7 @@ func main() {
 	helloRoute.AppendSlash(false)
 	helloRoute.Insert()
 
-	cgr.Run("8000", r)
+	r.Run("8000")
 }
 
 func homePost(w http.ResponseWriter, _ *http.Request){
