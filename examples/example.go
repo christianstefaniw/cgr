@@ -80,7 +80,7 @@ func hello(w http.ResponseWriter, r *http.Request) {
 
 func square(w http.ResponseWriter, r *http.Request) {
 	num, _ := strconv.ParseFloat(cgr.GetParams(r)["num"], 32)
-	pow := strconv.FormatFloat(math.Pow(num, 2), 'f', -1, 32)
+	pow := fmt.Sprint(math.Pow(num, 2))
 	_, err := w.Write([]byte(pow))
 	if err != nil {
 		panic("error")
