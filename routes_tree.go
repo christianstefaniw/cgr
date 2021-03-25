@@ -54,19 +54,22 @@ func newTree() *tree {
 }
 
 func (t *tree) insert(r *Route) error {
-	methodNode := t.method[r.method]
+	for _, method := range r.methods {
+		methodNode := t.method[method]
 
-	// if there is no node belonging to the path's first letter, create it
-	if _, ok := methodNode.children[string(r.letter)]; !ok {
-		t.initLetterNode(r.letter, methodNode)
-	}
+		// if there is no node belonging to the path's first letter, create it
+		if _, ok := methodNode.children[string(r.letter)]; !ok {
+			t.initLetterNode(r.letter, methodNode)
+		}
 
-	for _, letterNode := range methodNode.children {
-		// insert new node under the node belonging to the path's first letter
-		if r.letter == letterNode.letter {
-			letterNode.children[r.rawPath] = routeNode(r)
+		for _, letterNode := range methodNode.children {
+			// insert new node under the node belonging to the path's first letter
+			if r.letter == letterNode.letter {
+				letterNode.children[r.rawPath] = routeNode(r)
+			}
 		}
 	}
+
 	return nil
 }
 

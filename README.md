@@ -43,7 +43,7 @@ func main() {
 	logger := cgr.NewMiddleware(loggerMiddleware)
 	test := cgr.NewMiddleware(testMiddleware)
 
-	r.Route("/:msg").Method("GET").Handler(echo).Assign(logger).Assign(test).Insert()
+	r.Route("/:msg").Method("GET", "POST").Handler(echo).Assign(logger).Assign(test).Insert()
 	r.Route("/").Method("GET").Handler(home).Insert()
 	r.Route("/").Method("POST").Handler(homePost).Insert()
 	r.Route("/../../clean").Method("PUT").Handler(showPath).SkipClean(false).Insert()
@@ -102,4 +102,5 @@ func showPath(w http.ResponseWriter, r *http.Request) {
 func echo(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(cgr.GetParams(r)["msg"]))
 }
+
 ```

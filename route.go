@@ -14,7 +14,7 @@ type Route struct {
 	handlerFunc http.HandlerFunc
 	letter      rune
 	params      *params
-	method      string
+	methods     []string
 	router      *Router
 	middleware  *middlewareLinkedList
 	routeConf
@@ -27,8 +27,9 @@ func (route *Route) Assign(middleware *middleware) *Route {
 }
 
 // set an http protocol for the Route
-func (route *Route) Method(m string) *Route {
-	route.method = strings.ToUpper(m)
+func (route *Route) Method(m ...string) *Route {
+	route.methods = m
+
 	return route
 }
 
