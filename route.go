@@ -137,7 +137,7 @@ func GetParams(r *http.Request) map[string]string {
 func (route *Route) executeMiddleware(w http.ResponseWriter, r *http.Request) {
 	currNode := route.middleware.head
 	for currNode != nil {
-		currNode.mware.run()
+		currNode.mware.run(&w, r)
 		currNode = currNode.next
 	}
 	route.handlerFunc.ServeHTTP(w, r)

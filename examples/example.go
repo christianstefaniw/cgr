@@ -10,13 +10,13 @@ import (
 	"github.com/ChristianStefaniw/cgr"
 )
 
-func loggerMiddleware() {
+func loggerMiddleware(w *http.ResponseWriter, r *http.Request) {
 	fmt.Println("Logger middleware executing...")
 	t := time.Now()
 	fmt.Println(t)
 }
 
-func testMiddleware() {
+func testMiddleware(w *http.ResponseWriter, r *http.Request) {
 	fmt.Println("test middleware executing...")
 }
 
