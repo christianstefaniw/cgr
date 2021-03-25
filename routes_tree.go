@@ -44,6 +44,11 @@ func newTree() *tree {
 				route:    nil,
 				letter:   ' ',
 			},
+			http.MethodOptions: {
+				children: make(map[string]*node),
+				route:    nil,
+				letter:   ' ',
+			},
 		},
 	}
 }
@@ -55,7 +60,6 @@ func (t *tree) insert(r *Route) error {
 	if _, ok := methodNode.children[string(r.letter)]; !ok {
 		t.initLetterNode(r.letter, methodNode)
 	}
-
 
 	for _, letterNode := range methodNode.children {
 		// insert new node under the node belonging to the path's first letter
@@ -102,7 +106,7 @@ func (t *tree) search(method string, path string) (*Route, error) {
 	if _, ok := methodNode.children[string(letter)]; !ok {
 
 		// check if there are routes without a letter
-		if methodNode.children[string(' ')] != nil{
+		if methodNode.children[string(' ')] != nil {
 			letter = ' '
 		} else {
 			return nil, errors.New("path not found")
