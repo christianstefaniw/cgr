@@ -2,7 +2,7 @@ package cgr
 
 type _node struct {
 	next  *_node
-	mware *middleware
+	mware *Middleware
 }
 
 // singly linked list for storing middlewares
@@ -10,7 +10,7 @@ type middlewareLinkedList struct {
 	head *_node
 }
 
-func (ll *middlewareLinkedList) insert(mware *middleware) {
+func (ll *middlewareLinkedList) insert(mware *Middleware) {
 	newNode := new(_node)
 	newNode.next = nil
 	newNode.mware = mware

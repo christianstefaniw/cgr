@@ -21,7 +21,7 @@ type Route struct {
 }
 
 // assign middleware to the route
-func (route *Route) Assign(middleware *middleware) *Route {
+func (route *Route) Assign(middleware *Middleware) *Route {
 	route.middleware.insert(middleware)
 	return route
 }

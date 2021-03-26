@@ -4,16 +4,16 @@ import "net/http"
 
 type middlewareHandle func(w http.ResponseWriter, r *http.Request)
 
-type middleware struct {
+type Middleware struct {
 	handler middlewareHandle
 }
 
-func NewMiddleware(handler middlewareHandle) *middleware {
-	return &middleware{
+func NewMiddleware(handler middlewareHandle) *Middleware {
+	return &Middleware{
 		handler: handler,
 	}
 }
 
-func (middleware *middleware) run(w http.ResponseWriter, r *http.Request) {
+func (middleware *Middleware) run(w http.ResponseWriter, r *http.Request) {
 	middleware.handler(w, r)
 }
