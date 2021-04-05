@@ -9,7 +9,7 @@ import (
 // ServeHTTP dispatches the handler registered in the matched route.
 func (router *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
-	defer internalError(&w)
+	defer internalError(w)
 
 	method := req.Method
 	path := req.URL.Path
@@ -25,15 +25,11 @@ func (router *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	ctx := context.WithValue(req.Context(), "params", paramsAsMap)
 
-	if r.middleware.len() == 0 {
-		r.handlerFunc.ServeHTTP(w, req.WithContext(ctx))
-	} else {
-		r.executeMiddleware(w, req.WithContext(ctx))
-	}
+	r.executeMiddleware(w, req.WithContext(ctx))
 }
 
-func internalError(w *http.ResponseWriter) {
+func internalError(w http.ResponseWriter) {
 	if r := recover(); r != nil {
-		http.Error(*w, "500 Internal Server Error", http.StatusInternalServerError)
+		http.Error(w, "500 Internal Server Error", http.StatusInternalServerError)
 	}
 }

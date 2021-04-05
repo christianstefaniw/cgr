@@ -17,7 +17,7 @@ type Route struct {
 	methods     []string
 	router      *Router
 	middleware  *middlewareLinkedList
-	routeConf
+	RouteConf
 }
 
 // assign middleware to the route
@@ -113,7 +113,7 @@ func (router *Router) Route(path string) *Route {
 
 	r := &Route{
 		rawPath:    path,
-		routeConf:  router.routeConf,
+		RouteConf:  router.RouteConf,
 		router:     router,
 		middleware: new(middlewareLinkedList),
 	}
@@ -122,8 +122,8 @@ func (router *Router) Route(path string) *Route {
 }
 
 // Returns a pointer to a new Route configuration with the default configurations
-func NewRouteConf() *routeConf {
-	conf := &routeConf{}
+func NewRouteConf() *RouteConf {
+	conf := new(RouteConf)
 	conf.setDefaultRouteConf()
 	return conf
 }
@@ -140,6 +140,11 @@ func (route *Route) executeMiddleware(w http.ResponseWriter, r *http.Request) {
 	for currNode != nil {
 		currNode.mware.run(w, r)
 		currNode = currNode.next
+	}
+
+	if r.Method == "OPTIONS" && route.handlePreflight {
+		CorsHandler(w, r)
+		return
 	}
 	route.handlerFunc.ServeHTTP(w, r)
 }

@@ -25,19 +25,3 @@ func (ll *middlewareLinkedList) insert(mware *Middleware) {
 		currNode.next = newNode
 	}
 }
-
-func (ll *middlewareLinkedList) len() int {
-	currNode := ll.head
-
-	if currNode == nil {
-		return 0
-	}
-
-	var len int
-
-	for currNode != nil {
-		len++
-		currNode = currNode.next
-	}
-	return len
-}

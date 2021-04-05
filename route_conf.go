@@ -1,20 +1,10 @@
 package cgr
 
-
 // route configurations
-type routeConf struct {
-	appendSlash bool
-	skipClean   bool
-}
-
-
-
-// example.com/path is treated the same as example.com/path/
-// Default is true
-
-func (conf *routeConf) AppendSlash(value bool) *routeConf {
-	conf.appendSlash = value
-	return conf
+type RouteConf struct {
+	appendSlash     bool
+	skipClean       bool
+	handlePreflight bool
 }
 
 // example.com/path is treated the same as example.com/path/
@@ -24,7 +14,11 @@ func (route *Route) AppendSlash(value bool) *Route {
 	return route
 }
 
-
+// Whether or not to handle cors preflight request
+func (route *Route) HandlePreflight(value bool) *Route {
+	route.handlePreflight = value
+	return route
+}
 
 //If set to false:
 // 1. Replace multiple slashes with a single slash.
@@ -50,20 +44,33 @@ func (route *Route) SkipClean(value bool) *Route {
 //
 //Default value is false
 
-func (conf *routeConf) SkipClean(value bool) *routeConf {
+func (conf *RouteConf) SkipClean(value bool) *RouteConf {
 	conf.skipClean = value
 	return conf
 }
 
+// example.com/path is treated the same as example.com/path/
+// Default is true
+
+func (conf *RouteConf) AppendSlash(value bool) *RouteConf {
+	conf.appendSlash = value
+	return conf
+}
+
+// Whether or not to handle cors preflight request
+func (conf *RouteConf) HandlePreflight(value bool) *RouteConf {
+	conf.handlePreflight = value
+	return conf
+}
 
 // Set custom configurations for a route
-func (route *Route) SetConf(conf *routeConf) *Route {
-	route.routeConf = *conf
+func (route *Route) SetConf(conf *RouteConf) *Route {
+	route.RouteConf = *conf
 	return route
 }
 
-
-func (conf *routeConf) setDefaultRouteConf() {
+func (conf *RouteConf) setDefaultRouteConf() {
 	conf.appendSlash = true
 	conf.skipClean = false
+	conf.handlePreflight = false
 }

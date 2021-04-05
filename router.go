@@ -11,7 +11,7 @@ import (
 type Router struct {
 	routes   *tree
 	warnings []string
-	routeConf
+	RouteConf
 }
 
 type param struct {
@@ -64,7 +64,7 @@ func (router *Router) Insert(route *Route) {
 
 // returns a pointer to a new Router with the default route configurations
 func NewRouter() *Router {
-	r := &Router{}
+	r := new(Router)
 	r.setDefaultRouteConf()
 	r.routes = newTree()
 	return r
