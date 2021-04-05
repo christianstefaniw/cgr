@@ -21,6 +21,7 @@ func testMiddleware(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+
 	r := cgr.NewRouter()
 	squareConf := cgr.NewRouteConf()
 
@@ -34,10 +35,10 @@ func main() {
 
 	logger := cgr.NewMiddleware(loggerMiddleware)
 	test := cgr.NewMiddleware(testMiddleware)
+	cors := cgr.NewMiddleware(corsMiddleware)
 
 	r.Route("/:msg").Method("GET", "POST").Handler(echo).Assign(logger).Assign(test).Insert()
-	r.Route("/").Method("GET").Handler(home).Insert()
-	r.Route("/").Method("POST").Handler(homePost).Insert()
+	r.Route("/").Method("GET", "POST", "OPTIONS").HandlePreflight(true).Assign(cors).Handler(home).Insert()
 	r.Route("/../../clean").Method("PUT").Handler(showPath).SkipClean(false).Insert()
 
 	r.Route("/square/:num/").SetConf(squareConf).Method("GET").Handler(square).Insert()
@@ -57,10 +58,6 @@ func main() {
 	helloRoute.Insert()
 
 	r.Run("8000")
-}
-
-func homePost(w http.ResponseWriter, _ *http.Request) {
-	w.Write([]byte("post"))
 }
 
 func home(w http.ResponseWriter, _ *http.Request) {
@@ -83,7 +80,7 @@ func square(w http.ResponseWriter, r *http.Request) {
 	pow := fmt.Sprint(math.Pow(num, 2))
 	_, err := w.Write([]byte(pow))
 	if err != nil {
-		panic("error")
+		panic(err)
 	}
 }
 
@@ -93,4 +90,10 @@ func showPath(w http.ResponseWriter, r *http.Request) {
 
 func echo(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(cgr.GetParams(r)["msg"]))
+}
+
+func corsMiddleware(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Access-Control-Allow-Origin", "*")
+
+	w.Header().Add("Access-Control-Allow-Headers", "*")
 }
