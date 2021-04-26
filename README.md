@@ -1,7 +1,6 @@
 # My Golang Router
 
-Installation  
-```go get github.com/ChristianStefaniw/cgr```
+Archived in favour of [cgr-v2](https://github.com/christianstefaniw/cgr-v2)
 
 Example
 
